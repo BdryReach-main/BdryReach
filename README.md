@@ -11,7 +11,7 @@
 </div>
 
 ## 1. Tool Installation
-All experiments are conducted on a virtual machine system with an **Intel® Core™ i7-10750H CPU @ 2.60GHz × 8 and 5.8 GiB of memory, running Ubuntu 20.04.3 LTS**. We recommend that the operating environment has similar hardware resources and runs on a **Linux system**. On a Linux system, it is necessary to install the **cmake** tool and the various **third-party libraries** required for BdryReach.
+To run BdrtReach in a Linux system, it is necessary to install the **cmake** tool and the various **third-party libraries** required for BdryReach.
 
 ### 1.1 Required Third-Party Libraries
 
@@ -77,16 +77,16 @@ template <typename Number>
         overRtime, int steps, double radius, double over_step, double bound_step, int Zover_order)
 ```
 **Parameters:**
-* **mysys:** differential equation for computing reachable sets.
-* **mysysBack:** reverse differential equations for result verification.
+* **mysys:** ordinary differential equation for computing reachable sets.
+* **mysysBack:** time-inverted ordinary differential equation for result verification.
 * **options:** relevant configuration for outer-approximation of reachable set computation in the program.
 * **R0:** initial set.
 * **overRtime:** step size for inner-approximation of reachable set computation at each step.
 * **steps:** number of iterations for inner-approximation of reachable set computation.
 * **radius:** maximum allowed length of generator for facets.
-* **over_step:** step size for outer-approximation of reachable set computation for the entire set at each step in inner-approximation of reachable set computation.
-* **bound_step:** step size for outer-approximation of reachable Set computation for the boundary of the set at each step in inner-approximation of reachable set computation.
-* **Zover_order:** limit on the zonotope order for outer-approximation of reachable set computation for the entire set at each step in inner-approximation of reachable set computation.
+* **over_step:** step size for outer-approximation computation for the entire set at each step in inner-approximation computation.
+* **bound_step:** step size for outer-approximation computation for the boundary of the set at each step in inner-approximation computation.
+* **Zover_order:** limit on the zonotope order for outer-approximation computation for the entire set at each step in inner-approximation computation.
 ### 2.2 Test Case for Outer-approximation of Reachable Set Computation
 **As an example, we perform the outer-approximation of the reachable set computation for the VanderPol model. The file computes the outer-approximation from the initial region ([1.23, 1.57], [2.34, 2.46]) over the time interval 0 - 6.74 seconds.The specific file location is:**
 ```RobotFramework
@@ -98,8 +98,8 @@ template <typename Number>
 #include <plotter/matplotlibcpp.h> // Header file for Matplotlib C++ plotting library
 #include <plotter/plotter.h> // Header file for result plotting
 ```
-### 2.2.2 Define Differential Equation
-**We define the form of differential equations using the Capd library. For detailed information on the differential equation system in Capd, please refer to the [Capd documentation](https://capd.sourceforge.net/capdDynSys/docs/html/maps.html) on differential equation systems.**
+### 2.2.2 Definition of Differential Equations
+**We define the form of differential equations using the Capd library. For detailed information on the differential equation system in Capd, please refer to the [Capd documentation](https://capd.sourceforge.net/capdDynSys/docs/html/maps.html) on ordinary differential equation systems.**
 
 
 ```cpp
@@ -128,7 +128,7 @@ IMap f(_f, dimIn, dimOut, noParam, MaxDerivativeOrder); // Constructing IMap for
 
 ```
 ### 2.2.3 Parameter Configuration for Computing Reachable Sets
-**Here, we adopt the same parameter definitions as the MATLAB Reachable Set Computation Toolbox CORA. The specific meanings of each parameter can be found in CORA's documentation. please refer to the [manual](result_picture/Cora2021Manual.pdf) of CORA.**
+**Here, we adopt the same parameter definitions as the MATLAB Reachable Set Computation Toolbox CORA. The specific meanings of each parameter can be found in CORA's documentation. please refer to the [manual of CORA](result_picture/Cora2021Manual.pdf).**
 ```cpp
     NonlinearSys<double> mysys(f, 2, 0, 2);
     ReachOptions<double> options;
@@ -163,8 +163,8 @@ IMap f(_f, dimIn, dimOut, noParam, MaxDerivativeOrder); // Constructing IMap for
     options.set_usekrylovError(1);
     options.set_max_error(DBL_MAX*Eigen::MatrixXd::Ones(2,1));
 ```
-### 2.2.4 Invoking the Boundary-based Method for Computing the Outer-approximations of Reachable Sets
-This step invokes our boundary-based method for computing the outer-approximations of reachable sets. Please refer to **Section 2.1.1** for the meanings of various parameters.
+### 2.2.4 Invoking the Boundary-based Method for Computing Outer-approximations of Reachable Sets
+This step invokes our boundary-based method for computing outer-approximations of reachable sets. Please refer to **Section 2.1.1** for the meanings of various parameters.
 ```cpp
 vector<ReachableSet<double>> BdReachset = OverApprox::BdReach(mysys, options, R0_);
 ```
@@ -192,9 +192,9 @@ plt::show();
 #include <plotter/plotter.h>          // Header for result visualization
 #include <underApprox/underApprox.h>  // Header for includes the interface for computing reachable sets under approximation.
 ```
-### 2.3.2 Define Differential Equation
+### 2.3.2 Definition of Differential Equations
 
-**We use the Capd library to define the form of the differential equations. Refer to the Capd documentation on [differential equation systems](https://capd.sourceforge.net/capdDynSys/docs/html/maps.html). Notably, the computation of our method requires validation of the obtained reachable set inner-approximation. Therefore, an additional definition for a reverse differential equation is necessary.**
+**We use the Capd library to define the form of the differential equations. Refer to the Capd documentation on [differential equation systems](https://capd.sourceforge.net/capdDynSys/docs/html/maps.html). Notably, the computation of our method requires validation of the obtained reachable set inner-approximation. Therefore, an additional definition for a time-inverted differential equation is necessary.**
 
 ```cpp
 double mu = 1.;
